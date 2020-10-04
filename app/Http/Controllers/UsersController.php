@@ -9,6 +9,9 @@ use Exception;
 
 class UsersController extends Controller
 {
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         try {
@@ -65,11 +68,45 @@ class UsersController extends Controller
                 'username' => $user->username,
                 'email'    => $user->email
             ], 201);
-        } catch (\PDOException $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
             ], 422);
         }
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function authenticate(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'email'    => 'required|email',
+                'password' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+
+        $token = app('auth')->attempt($request->only('email', 'password'));
+
+        if ($token) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User authenticate',
+                'token'   => $token
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials',
+        ]);
     }
 }
