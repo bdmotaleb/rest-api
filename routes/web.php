@@ -20,6 +20,13 @@ $router->group([
     $router->post('/login', 'UsersController@authenticate');
 
     # Users
-    $router->get('/users', 'UsersController@index');
     $router->post('/users', 'UsersController@create');
+
+    # Restricted Routes
+    $router->group(['middleware' => 'auth:api'], function () use ($router) {
+        # Users
+        $router->get('/users', 'UsersController@index');
+        $router->get('/user/profile', 'UsersController@profile');
+    });
+
 });

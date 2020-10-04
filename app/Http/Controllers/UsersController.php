@@ -109,4 +109,24 @@ class UsersController extends Controller
             'message' => 'Invalid credentials',
         ]);
     }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function profile()
+    {
+        $user = app('auth')->user();
+
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User profile found.',
+                'user'    => $user
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized',
+        ]);
+    }
 }
