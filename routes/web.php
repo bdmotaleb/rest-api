@@ -26,7 +26,10 @@ $router->group([
     $router->group(['middleware' => 'auth:api'], function () use ($router) {
         # Users
         $router->get('/users', 'UsersController@index');
-        $router->get('/user/profile', 'UsersController@profile');
+        $router->get('/users/{id}', 'UsersController@show');
+        $router->get('/users/profile', 'UsersController@profile');
+        $router->post('/users/update', 'UsersController@update');
+        $router->delete('/users/{id}', 'UsersController@destroy');
     });
 
 });

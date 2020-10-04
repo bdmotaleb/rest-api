@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
@@ -128,5 +129,70 @@ class UsersController extends Controller
             'success' => false,
             'message' => 'Unauthorized',
         ]);
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        $user = app('db')->table('users')->select('name', 'username', 'email')->where('id', $id)->first();
+
+        if ($user) {
+            return response()->json([
+                'success' => true,
+                'user'    => $user
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized',
+        ]);
+    }
+
+
+    public function update(Request $request)
+    {
+        try {
+            $user       = User::find($request->id);
+            $user->name = $request->name;
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Yay! User has been successfully updated!',
+                'user'    => $user
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Oops! Unable to update user.',
+            ]);
+        }
+    }
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
+    {
+        try {
+            # app('db')->table('users')->where('id', $id)->delete();
+
+            $user = User::find($id);
+            $user->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Yay! User has been successfully removed!',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Oops! Unable to delete this user.',
+            ]);
+        }
     }
 }
